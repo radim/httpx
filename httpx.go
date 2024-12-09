@@ -2,9 +2,10 @@ package httpx
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 type (
@@ -102,11 +103,12 @@ func InternalErrorsHandler(config AppConfig) func(http.ResponseWriter, *http.Req
 
 			// Check if the error has a stack trace
 			type stackTracer interface {
-				StackTrace() string
+				StackTrace() errors.StackTrace
 			}
 
 			if stackErr, ok := err.(stackTracer); ok {
-				errInfo.Stack = stackErr.StackTrace()
+				st := stackErr.StackTrace()
+				errInfo.Stack = fmt.Sprintf("%+v", st)
 			}
 		}
 
