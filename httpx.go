@@ -28,10 +28,6 @@ type (
 		StatusCode int
 	}
 
-	ErrorReporter interface {
-		ReportError(ctx context.Context, err error)
-	}
-
 	Renderer interface {
 		Render500(ctx context.Context, w http.ResponseWriter, errInfo *ErrorInfo)
 		RenderAppError(ctx context.Context, w http.ResponseWriter, appErr AppError)
@@ -39,8 +35,8 @@ type (
 
 	AppConfig interface {
 		IsDevelopment() bool
-		ErrorReporter() ErrorReporter
-		Renderer() Renderer
+		ReportError(ctx context.Context, err error)
+		GetRenderer() Renderer
 	}
 
 	ErrorInfo struct {
@@ -92,7 +88,7 @@ func InternalErrorsHandler(config AppConfig) func(http.ResponseWriter, *http.Req
 
 		w.WriteHeader(http.StatusInternalServerError)
 
-		config.ErrorReporter().ReportError(req.Context(), err)
+		config.ReportError(req.Context(), err)
 
 		if config.IsDevelopment() {
 			errInfo = &ErrorInfo{
