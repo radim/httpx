@@ -111,7 +111,7 @@ func InternalErrorsHandler(config AppConfig) func(http.ResponseWriter, *http.Req
 		}
 
 		// Use the Renderer to render the 500 error response
-		config.Renderer().Render500(context.Background(), w, errInfo)
+		config.GetRenderer().Render500(context.Background(), w, errInfo)
 	}
 }
 
