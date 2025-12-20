@@ -61,13 +61,13 @@ func Bind(r *http.Request, v any) error {
 	return BindForm(r, v)
 }
 
-// Validate validates struct and returns error map
+// Validate validates struct and returns error map with human-readable messages
 func Validate(v any) ValidationErrors {
 	errs := make(ValidationErrors)
 	if err := validate.Struct(v); err != nil {
 		if validationErrors, ok := err.(validator.ValidationErrors); ok {
 			for _, e := range validationErrors {
-				errs[e.Field()] = e.Tag()
+				errs[e.Field()] = TranslateError(e.Tag())
 			}
 		}
 	}
