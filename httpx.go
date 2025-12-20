@@ -51,8 +51,24 @@ func BadRequestError(content string, params ...interface{}) AppError {
 	return StatusError(http.StatusBadRequest, content, params...)
 }
 
+func NotFoundError(content string, params ...interface{}) AppError {
+	return StatusError(http.StatusNotFound, content, params...)
+}
+
 func UnauthorizedError(content string, params ...interface{}) AppError {
 	return StatusError(http.StatusUnauthorized, content, params...)
+}
+
+func ForbiddenError(content string, params ...interface{}) AppError {
+	return StatusError(http.StatusForbidden, content, params...)
+}
+
+func ConflictError(content string, params ...interface{}) AppError {
+	return StatusError(http.StatusConflict, content, params...)
+}
+
+func UnprocessableEntityError(content string, params ...interface{}) AppError {
+	return StatusError(http.StatusUnprocessableEntity, content, params...)
 }
 
 func StatusError(statusCode int, content string, params ...interface{}) AppError {
