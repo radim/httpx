@@ -17,6 +17,10 @@ type (
 		ClientErrs   AdapterFunc
 
 		UnauthorizedErr AdapterFunc
+
+		// OnError is called for every handler error or panic before the response is sent.
+		// Use this for logging, metrics, or error reporting.
+		OnError func(r *http.Request, err error)
 	}
 
 	Error interface {
@@ -154,6 +158,11 @@ func RecoverMiddleware(adapter *HandlerAdapter, next http.Handler) http.Handler 
 				default:
 					err = fmt.Errorf("unknown panic")
 				}
+
+				if adapter.OnError != nil {
+					adapter.OnError(r, err)
+				}
+
 				adapter.InternalErrs(w, r, err)
 			}
 		}()
@@ -164,6 +173,11 @@ func RecoverMiddleware(adapter *HandlerAdapter, next http.Handler) http.Handler 
 func (a *HandlerAdapter) Handle(h HTTPHandlerExt) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if err := h(w, req); err != nil {
+			// Call OnError callback first (for logging/reporting)
+			if a.OnError != nil {
+				a.OnError(req, err)
+			}
+
 			switch e := err.(type) {
 			case AppError:
 				if e.StatusCode == http.StatusUnauthorized && a.UnauthorizedErr != nil {
